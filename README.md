@@ -20,8 +20,8 @@
 
 1. 克隆專案存儲庫：
 ```bash
-git clone [repository-url]
-cd [repository-name]
+git clone https://github.com/clinno0616/hello11.git
+cd hello11
 ```
 
 2. 安裝所需套件：
