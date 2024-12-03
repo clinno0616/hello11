@@ -1,0 +1,16 @@
+numpy==1.24.1
+streamlit>=1.30.0
+python-dotenv>=1.0.0
+pathlib>=1.0.1
+requests>=2.31.0
+ffmpeg-python>=0.2.0
+openai-whisper>=20231117
+torch>=2.0.0
+torchaudio>=2.0.0
+googletrans==3.1.0a0
+opencv-python>=4.8.0
+moviepy>=1.0.3
+pandas>=2.0.0
+transformers>=4.30.0
+sentencepiece>=0.1.99
+opencc-python-reimplemented>=0.1.7
