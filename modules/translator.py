@@ -141,7 +141,7 @@ class Translator:
                 注意事項：
                 1. 請保持原文的語氣和風格
                 2. 使用繁體中文
-                3. 保留原文文字，一行顯示原文，另一行為翻譯結果，不要加入任何解釋或標記
+                3. 只返回翻譯結果，不要加入任何解釋或標記
                 """
                 
                 response = self.client.chat.completions.create(
