@@ -1,24 +1,27 @@
-# 音訊/影片轉文字系統 (Audio/Video Transcription System)
+# 音訊/影片轉文字系統
 
-這是一個基於 Streamlit 開發的音訊和影片轉文字系統，能夠將音訊或影片檔案轉換成文字稿，並支援多語言翻譯與字幕生成功能。
+這是一個基於 Streamlit 開發的應用程式，可以將音訊或影片檔案轉換成文字逐字稿和字幕檔。系統支援多語言辨識，並可自動翻譯成繁體中文。
 
 ## 功能特點
 
 - 支援多種音訊和影片格式（mp3、wma、wav、m4a、mp4、mov、avi、mkv）
-- 自動語言偵測與翻譯
-- 生成中文/雙語字幕檔（SRT 格式）
-- 支援逐字稿編輯與下載
-- 使用者友善的網頁介面
+- 自動語言辨識和翻譯
+- 生成逐字稿（支援編輯和下載）
+- 生成字幕檔（SRT 格式）
+- 支援雙語字幕輸出
+- 使用 OpenAI API 進行智能分段和翻譯
+- 直覺的網頁介面
 
 ## 系統需求
 
-- Python 3.7+
+- Python 3.10 或以上版本
 - FFmpeg（如果系統未安裝，程式會自動下載）
-- CUDA 支援（選配，可加速語音辨識處理）
+- CUDA 支援（可選，用於加速處理）
+- OpenAI API 金鑰
 
 ## 安裝步驟
 
-1. 克隆專案存儲庫：
+1. 克隆專案到本地：
 ```bash
 git clone https://github.com/clinno0616/hello11.git
 cd hello11
@@ -29,13 +32,12 @@ cd hello11
 pip install -r requirements.txt
 ```
 
-## 主要依賴套件
-
-- streamlit：網頁應用框架
-- whisper：OpenAI 的語音辨識模型
-- googletrans：Google 翻譯 API
-- opencc：中文簡繁轉換
-- torch：PyTorch（用於 Whisper 模型）
+3. 設定環境變數：
+建立 `.env` 檔案，並加入以下設定：
+```
+OPENAI_API_KEY=你的OpenAI_API金鑰
+OPENAI_MODEL=gpt-4-1106-preview  # 或其他支援的模型
+```
 
 ## 使用方法
 
@@ -47,35 +49,65 @@ streamlit run app.py
 2. 在瀏覽器中開啟顯示的網址（預設為 http://localhost:8501）
 
 3. 使用步驟：
-   - 點擊「上傳音訊或影片檔案」選擇要處理的檔案
-   - 等待系統處理（包含語音辨識、翻譯等步驟）
-   - 在處理完成後，可以：
-     - 檢視轉換結果
-     - 編輯文字內容
-     - 下載逐字稿和字幕檔
+   - 選擇處理選項（生成逐字稿和/或字幕檔）
+   - 上傳音訊或影片檔案
+   - 等待處理完成
+   - 檢視結果並下載輸出檔案
 
 ## 專案結構
 
 ```
 .
-├── app.py                  # 主程式入口
+├── app.py                  # 主要的 Streamlit 應用程式
 ├── modules/
-│   ├── processor.py       # 音訊/影片處理模組
-│   └── translator.py      # 翻譯處理模組
-├── input/                 # 輸入檔案暫存目錄
-├── output/               # 輸出檔案目錄
-│   ├── transcripts/     # 逐字稿輸出目錄
-│   └── subtitles/       # 字幕檔輸出目錄
-├── model/                # Whisper 模型目錄
-├── temp/                # 暫存檔案目錄
-└── ffmpeg/              # FFmpeg 執行檔目錄
+│   ├── processor.py        # 音訊/影片處理核心模組
+│   ├── translator.py       # 文字翻譯模組
+│   └── openai_processor.py # OpenAI 文字處理模組
+├── input/                  # 輸入檔案暫存目錄
+├── output/                 # 輸出檔案目錄
+│   ├── transcripts/       # 逐字稿輸出
+│   └── subtitles/         # 字幕檔輸出
+├── model/                  # Whisper 模型存放目錄
+├── temp/                   # 暫存檔案目錄
+└── ffmpeg/                # FFmpeg 工具目錄（如果需要）
 ```
+
+## 主要模組說明
+
+### AudioVideoProcessor (processor.py)
+- 處理音訊和影片檔案
+- 使用 Whisper 模型進行語音辨識
+- 生成逐字稿和字幕檔
+
+### Translator (translator.py)
+- 使用 OpenAI API 進行語言偵測和翻譯
+- 支援多語言轉換為繁體中文
+- 處理雙語輸出
+
+### OpenAITextProcessor (openai_processor.py)
+- 使用 OpenAI API 進行文字智能分段
+- 優化文字排版和格式
 
 ## 注意事項
 
-- 檔案處理時間依檔案大小和系統效能而定
-- 建議使用具有 CUDA 支援的系統以提升處理效率
-- 翻譯功能需要網路連線
+1. 請確保有足夠的磁碟空間用於處理檔案
+2. 較大的檔案可能需要較長的處理時間
+3. 需要穩定的網路連接以使用 OpenAI API
+4. 使用前請確認 OpenAI API 金鑰設定正確
+
+## 故障排除
+
+1. FFmpeg 相關問題：
+   - 確認系統環境變數是否正確設定
+   - 檢查 ffmpeg 目錄權限
+
+2. 檔案處理錯誤：
+   - 確認檔案格式是否支援
+   - 檢查檔案是否損壞
+
+3. API 錯誤：
+   - 確認 API 金鑰是否正確
+   - 檢查網路連接狀態
 
 ## 授權條款
 
@@ -100,4 +132,4 @@ limitations under the License.
 詳細的授權條款內容請參閱 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) 官方網站。
 
 ## 使用者畫面
-![image](https://github.com/user-attachments/assets/c746b220-2f62-4b8c-8a58-32a5aaa609e3)
+
