@@ -4,10 +4,9 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import subprocess
-import json
-import numpy as np
-import re
 from modules.translator import Translator
+import torch
+from modules.openai_processor import OpenAITextProcessor  # 改為引入 OpenAITextProcessor
 
 class AudioVideoProcessor:
     def __init__(self):
@@ -17,6 +16,7 @@ class AudioVideoProcessor:
         self.ffmpeg_path = self.setup_ffmpeg()
         self.model = self.load_whisper_model()
         self.translator = Translator()
+        self.text_processor = OpenAITextProcessor()  # 使用 OpenAITextProcessor 替代 LLMTextProcessor
 
     def setup_directories(self):
         """設置必要的目錄"""
@@ -142,7 +142,7 @@ class AudioVideoProcessor:
             if not result or "text" not in result:
                 raise Exception("語音辨識結果為空")
 
-            # 檢查是否為日文
+            # 檢查語言
             detected_language = result.get("language", "")
             print(f"偵測到的語言: {detected_language}")
         
@@ -341,44 +341,17 @@ class AudioVideoProcessor:
                 shutil.rmtree(extracted_dir, ignore_errors=True)
 
     def format_transcript(self, text):
-        """格式化逐字稿，添加標點符號和段落分隔"""
+        """使用 OpenAI API 格式化逐字稿"""
         if not text:
             return ""
             
-        # 1. 基本清理
-        text = text.strip()
-        
-        # 2. 分句和加入標點符號
-        # 根據語音停頓和語意添加句號
-        sentences = re.split(r'(?<=[。！？\!?])|(?<=[\w\d])\s+(?=[A-Z])', text)
-        sentences = [s.strip() for s in sentences if s.strip()]
-        
-        # 為沒有結束標點的句子添加句號
-        formatted_sentences = []
-        for sentence in sentences:
-            if not sentence[-1] in '。！？!?.':
-                sentence += '。'
-            formatted_sentences.append(sentence)
-        
-        # 3. 段落處理
-        # 根據句子數量和長度自動分段
-        paragraphs = []
-        current_paragraph = []
-        
-        for sentence in formatted_sentences:
-            current_paragraph.append(sentence)
+        try:
+            # 使用 OpenAI API 進行語意分析和分段
+            print("使用 OpenAI API 進行語意分析和分段")
+            formatted_text = self.text_processor.process_text(text)
+            return formatted_text
             
-            # 當前段落超過3句話或字數超過100，就分段
-            current_text = ''.join(current_paragraph)
-            if len(current_paragraph) >= 3 or len(current_text) >= 100:
-                paragraphs.append(''.join(current_paragraph))
-                current_paragraph = []
-        
-        # 處理剩餘的句子
-        if current_paragraph:
-            paragraphs.append(''.join(current_paragraph))
-        
-        # 4. 合併段落，使用兩個換行符分隔
-        formatted_text = '\n\n'.join(paragraphs)
-        
-        return formatted_text                
+        except Exception as e:
+            print(f"OpenAI API 處理失敗，使用基本格式化：{str(e)}")
+            # 如果 API 處理失敗，使用原有的格式化方法
+            return self._basic_format_transcript(text)            
