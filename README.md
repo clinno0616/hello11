@@ -119,6 +119,7 @@ limitations under the License.
 詳細的授權條款內容請參閱 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) 官方網站。
 
 ## 使用者畫面
-![image](https://github.com/user-attachments/assets/5534ec8b-123e-4325-b5b0-4f2cbddf2589)
+![image](https://github.com/user-attachments/assets/7fbf7363-b880-475f-97aa-ba694cd80403)
+
 
 
