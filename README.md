@@ -59,6 +59,7 @@ streamlit run app.py
 ```
 .
 ├── app.py                  # 主要的 Streamlit 應用程式
+├── .env                    # 環境變數
 ├── modules/
 │   ├── processor.py        # 音訊/影片處理核心模組
 │   ├── translator.py       # 文字翻譯模組
